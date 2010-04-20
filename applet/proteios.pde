@@ -19,7 +19,7 @@ int held_pos_y;
 int grid_pos_x;
 int grid_pos_y;
 
-float zoom = 1;
+float zoom = 20;
 
 PImage resize_cursor;
 
