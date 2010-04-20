@@ -42,6 +42,9 @@ static final String aa			= "RHKDESTNQCUGPAILMFWYV";
 void setup(){
 	size(600,600);
 	
+	frame.setResizable(true);
+	frame.setTitle("Proteios - Protein Visualization");
+	
 	resize_cursor = loadImage("resize_cursor.png");
 	
 	String file = "sequence.txt";
