@@ -45,9 +45,7 @@ class Protein{
 			
 			protein_shape_rel[i] = new PVector(hor, ver);
 			
-			float new_x = previous_node.x + hor;
-			float new_y = previous_node.y + ver;
-			protein_shape_abs[i] = new PVector(new_x, new_y);
+			protein_shape_abs[i] = PVector.add(previous_node, protein_shape_rel[i]);
 			
 			// println(new_x + "," + new_y);
 		}
@@ -64,7 +62,7 @@ class Protein{
 			ellipse(0,0, 
 							dot_size,dot_size);
 
-			fill(#3152B4);
+			fill(#1C8FF2);
 			ellipse(protein_shape_abs[protein_length].x*scale_factor,
 							protein_shape_abs[protein_length].y*scale_factor, 
 							dot_size,dot_size);
@@ -80,6 +78,16 @@ class Protein{
 			float y2 = second_node.y * scale_factor;
 			
 			line(x1, y1, x2, y2);
+			
+			if (zoom > 20 && aaOn){
+				pushStyle();
+					textAlign(CENTER);
+					textSize(10);
+					fill(#2F9416);
+					
+					text(sequence.charAt(i), x1+(x2-x1)*1.02, y1+(y2-y1)*1.02);
+				popStyle();
+			}
 		}
 	
 	} // end drawPath
