@@ -30,23 +30,28 @@ boolean locked = false;
 boolean magnifyMode = false;
 boolean navigatorOn = false;
 boolean aaOn = false;
+boolean colorsOn = true;
 
 boolean first_run = true;
 
 static final float angle_inc	= 360/21;
 static final float dot_size		= 6;
 
-static final String aa_pos	= "RHK";
-static final String aa_neg	= "DE";
-static final String aa_pol	= "STNQ";
-static final String aa_spe	= "CUGP";
-static final String aa_pho	= "AILMFWYV";
+static final String aa_pos	= "RHK"; //				0xE41A1C	Red
+static final String aa_neg	= "DE"; //				0x377EB8	Blue
+static final String aa_pol	= "STNQ"; //			0x4DAF4A	Green
+static final String aa_spe	= "CUGP"; //			0x984EA3	Purple
+static final String aa_pho	= "AILMFWYV"; //	0xFF7F00	Orange
 static final String aa			= "RHKDESTNQCUGPAILMFWYV";
 
+
+static final color[] aa_colors = new color[5];
 
 
 void setup(){
 	size(600,600);
+	smooth();
+	frameRate(30);
 	
 	fs = new SoftFullScreen(this);
 	// fs.enter();
@@ -58,12 +63,19 @@ void setup(){
 	resize_cursor = loadImage("resize_cursor.png");
 	
 	String file = "sequence.txt";
+	
+	aa_colors[0] = color(#E41A1C); // Red
+	aa_colors[1] = color(#377EB8); // Blue
+	aa_colors[2] = color(#4DAF4A); // Green
+	aa_colors[3] = color(#984EA3); // Purple
+	aa_colors[4] = color(#FF7F00); // Orange
 
 	
 	proteins[0] = new Protein(loadProteinSequence("sequence_heavy.txt"));
 	proteins[1] = new Protein(loadProteinSequence("sequence_light.txt"));
 	background(0);
 	
+
 
 } // end setup
 
@@ -72,6 +84,7 @@ void draw(){
 	
 	background(0);
 	fill(#FFFFFF);
+	textSize(12);
 	
 	if (magnifyMode){
 		pushStyle();
@@ -90,6 +103,16 @@ void draw(){
 			
 			textSize(18);
 			text("A", 30, 16);
+		popStyle();
+	}
+	
+	if (colorsOn){
+		pushStyle();
+			textAlign(LEFT);
+			fill(#2F9416);
+			
+			textSize(18);
+			text("C", 50, 16);
 		popStyle();
 	}
 	
@@ -112,7 +135,7 @@ void draw(){
 	strokeWeight(1);
 	
 		pushMatrix();
-			translate(grid_pos.x, grid_pos.y);
+			translate(grid_pos.x, grid_pos.y);			
 			proteins[protein_selected].drawPath(zoom);
 		popMatrix();
 		
@@ -146,6 +169,7 @@ void drawNavigator(){
 	textAlign(CENTER);
 	pushMatrix();
 	
+	fill(#999999);
 		for (int i = 0; i < 21; i++){
 			text(aa.charAt(i), 200*cos(radians(angle_inc*i)), 200*sin(radians(angle_inc*i)));
 		}
@@ -155,11 +179,15 @@ void drawNavigator(){
 	stroke(#C3000A);
 	ellipse(0,0,8,8);
 
-	
+	stroke(aa_colors[0]);
 	arc(0,0, 370, 370, 0, radians(angle_inc*2));
+	stroke(aa_colors[1]);
 	arc(0,0, 370, 370, radians(angle_inc*3), radians(angle_inc*4));
+	stroke(aa_colors[2]);
 	arc(0,0, 370, 370, radians(angle_inc*5), radians(angle_inc*8));
+	stroke(aa_colors[3]);
 	arc(0,0, 370, 370, radians(angle_inc*9), radians(angle_inc*12));
+	stroke(aa_colors[4]);
 	arc(0,0, 370, 370, radians(angle_inc*13), radians(angle_inc*20));
 		
 	
@@ -216,13 +244,15 @@ void mouseDragged(){
 void keyPressed(){
 	if				(key == 'm'){
 			magnifyMode = magnifyMode ? false : true;
-	} else if	(key == 'c'){
+	} else if	(key == 'o'){
 			grid_pos.x = 0;
 			grid_pos.y = 0;
 	} else if	(key == 'n'){
 			navigatorOn = navigatorOn ? false : true;
 	} else if	(key == 'a'){
 			aaOn = aaOn ? false : true;
+	} else if (key == 'c'){
+			colorsOn = colorsOn ? false : true;
 	} else if	(key == '1'){
 			protein_selected = 0;
 	}	else if	(key == '2'){
