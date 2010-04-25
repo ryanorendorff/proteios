@@ -1,81 +1,91 @@
-// 
+// 	Note: use tab size 2
+
 //  proteios.pde
 //  Proteios -- COMP 150-04
 //  
 //  Created by Ryan Orendorff on 2010-04-15.
 //  Copyright 2010 RDO Designs. All rights reserved.
-// 
+
+//  www:     http://www.rdodesigns.com
+//  github:  http://github.com/proteios 
+//  email:   ryan.orendorff@gmail.com
+//  Twitter: RDO_Designs
+
+//  This file is part of Proteios.
+//  
+//  Proteios is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//  
+//  Proteios is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU General Public License for more details.
+//  
+//  You should have received a copy of the GNU General Public License
+//  along with Proteios. If not, see the GNU website for a copy.
+
 import fullscreen.*;
 SoftFullScreen fs;
 
-Protein protein;
-Protein[] proteins = new Protein[2];
-
-int protein_selected = 0;
-
-String file = "sequence.txt";
-
-float speed = 0.2;
-float acc = 0.2;
-
+// Vectors for positions of grid related to the screen.
 PVector held_pos = new PVector(0,0);
-
 PVector grid_pos = new PVector(0,0);
-
 float zoom = 1;
 
+// Use custom cursor for magnify mode. 
 PImage resize_cursor;
 
+// Different modes of operation.
 boolean locked = false;
 boolean magnifyMode = false;
 boolean navigatorOn = false;
 boolean aaOn = false;
 boolean colorsOn = true;
 
-boolean first_run = true;
-
+// angle from one amino acid to next.
 static final float angle_inc	= 360/21;
-static final float dot_size		= 6;
+ 
+Protein[] proteins = new Protein[2];
+int protein_selected = 0;
 
-static final String aa_pos	= "RHK"; //				0xE41A1C	Red
-static final String aa_neg	= "DE"; //				0x377EB8	Blue
-static final String aa_pol	= "STNQ"; //			0x4DAF4A	Green
-static final String aa_spe	= "CUGP"; //			0x984EA3	Purple
-static final String aa_pho	= "AILMFWYV"; //	0xFF7F00	Orange
+// Amino Acids, sorted by type.						//	Type:				Color:
+static final String aa_pos	= "RHK"; 			//	Positive		Red
+static final String aa_neg	= "DE"; 			//	Negative		Blue
+static final String aa_pol	= "STNQ"; 		//	Polar				Green
+static final String aa_spe	= "CUGP"; 		//	Special			Purple
+static final String aa_pho	= "AILMFWYV"; //	Hydrophobic	Orange
 static final String aa			= "RHKDESTNQCUGPAILMFWYV";
-
-
-static final color[] aa_colors = new color[5];
-
+																//	Red			 Blue			Green		 Purple		Orange
+static final color[] aa_colors = { #E41A1C, #377EB8, #4DAF4A, #984EA3, #FF7F00 };
+// Note: These finals are called in some classes (ex: Protein)
 
 void setup(){
 	size(600,600);
-	smooth();
 	frameRate(30);
 	
-	fs = new SoftFullScreen(this);
-	// fs.enter();
-	fs.setShortcutsEnabled(true);
-	
+	// Is resizable. Useful, so that 600x600 is not limiting.
 	frame.setResizable(true);
 	frame.setTitle("Proteios - Protein Visualization");
 	
+	// Fullscreen mode. Note that it takes on the size of the window
+	// and makes everything else black (so, a 600x600 window is just
+	// centered and surrounded by black instead of resized)
+	fs = new SoftFullScreen(this);
+	fs.setShortcutsEnabled(true);
+	// fs.setResolution(x, y)
+	
+	smooth();
+	
+	// in data folder
 	resize_cursor = loadImage("resize_cursor.png");
 	
-	String file = "sequence.txt";
-	
-	aa_colors[0] = color(#E41A1C); // Red
-	aa_colors[1] = color(#377EB8); // Blue
-	aa_colors[2] = color(#4DAF4A); // Green
-	aa_colors[3] = color(#984EA3); // Purple
-	aa_colors[4] = color(#FF7F00); // Orange
-
-	
+	// load two proteins of silk. Will replace with search function.
 	proteins[0] = new Protein(loadProteinSequence("sequence_heavy.txt"));
 	proteins[1] = new Protein(loadProteinSequence("sequence_light.txt"));
-	background(0);
 	
-
+	textSize(12);
 
 } // end setup
 
@@ -84,39 +94,11 @@ void draw(){
 	
 	background(0);
 	fill(#FFFFFF);
-	textSize(12);
 	
-	if (magnifyMode){
-		pushStyle();
-			textAlign(LEFT);
-			fill(#D35806);
-			
-			textSize(18);
-			text("M", 10, 16);
-		popStyle();
-	}
+	// Draws letter on top left of screen when a mode is on.
+	drawModes();
 	
-	if (aaOn){
-		pushStyle();
-			textAlign(LEFT);
-			fill(#2F9416);
-			
-			textSize(18);
-			text("A", 30, 16);
-		popStyle();
-	}
-	
-	if (colorsOn){
-		pushStyle();
-			textAlign(LEFT);
-			fill(#2F9416);
-			
-			textSize(18);
-			text("C", 50, 16);
-		popStyle();
-	}
-	
-	
+	// Draw the name of the protein in the upper right.
 	pushStyle();
 		textAlign(RIGHT);
 		if (protein_selected == 0){
@@ -128,8 +110,10 @@ void draw(){
 		text(zoom+"x", width-10, height-10);
 	popStyle();
 
+	// Make the middle of the screen (0,0). Note going up is the negative y.
 	translate(width/2, height/2);
 	
+	// Draw the protein selected. Select proteins with the number keys.
 	pushStyle();
 	stroke(#FFFFFF);
 	strokeWeight(1);
@@ -151,34 +135,33 @@ void draw(){
 	
 } // end draw
 
-
-String loadProteinSequence(){
-	return loadProteinSequence(file);
-} // end loadProteinSequence
-
+// Loads a protein. Note that the text file is only the protein sequence.
 String loadProteinSequence(String protein_file){
 	String[] sequence = loadStrings(protein_file);
 	return sequence[0].toUpperCase();
 } // end loadProteinSequence
 
 
-
-
+// Draws the Navigator circle. Turn on/off with the 'n' key.
 void drawNavigator(){
 	pushStyle();
 	textAlign(CENTER);
 	pushMatrix();
 	
+	// Gray letters.
 	fill(#999999);
-		for (int i = 0; i < 21; i++){
+	// Draw the letters for the navigator
+	for (int i = 0; i < 21; i++){
 			text(aa.charAt(i), 200*cos(radians(angle_inc*i)), 200*sin(radians(angle_inc*i)));
-		}
+	}
 	
+	// Draw center of navigator.
 	noFill();
 	strokeWeight(1);
 	stroke(#C3000A);
 	ellipse(0,0,8,8);
 
+	// Draw the arcs for the navigator
 	stroke(aa_colors[0]);
 	arc(0,0, 370, 370, 0, radians(angle_inc*2));
 	stroke(aa_colors[1]);
@@ -190,7 +173,7 @@ void drawNavigator(){
 	stroke(aa_colors[4]);
 	arc(0,0, 370, 370, radians(angle_inc*13), radians(angle_inc*20));
 		
-	
+	// Reset
 	popMatrix();
 	popStyle();
 }
@@ -200,12 +183,16 @@ void drawNavigator(){
 
 void mousePressed(){
 	
+	// Use a different icon for the magnification to emphasize the
+	// current mode.
 	if (magnifyMode){
 		cursor(resize_cursor, 16, 16); 
 	} else {
 		cursor(MOVE);
 	}
 	
+	// Does not work at the moment. Need to find the vector to the location
+	// on the model.
 	if(!locked) {
 		held_pos.x = mouseX;
 		held_pos.y = mouseY;
@@ -229,6 +216,7 @@ void mouseDragged(){
 		zoom += mouseX - pmouseX;
 		if (zoom < 1) zoom = 1;
 		
+		// zoom relative to current view
 		grid_pos.mult(zoom/old_zoom);
 		
 	} else {
@@ -236,28 +224,53 @@ void mouseDragged(){
 		grid_pos.x += mouseX - pmouseX;
 		grid_pos.y += mouseY - pmouseY;
 	}
-} // end mouseDragged
-
+} // end mouseDragged()
 
 
 
 void keyPressed(){
-	if				(key == 'm'){
+	if				(key == 'm'){ // Turn on magnification mouse movements
 			magnifyMode = magnifyMode ? false : true;
-	} else if	(key == 'o'){
+	} else if	(key == 'o'){ // return to the origin
 			grid_pos.x = 0;
 			grid_pos.y = 0;
-	} else if	(key == 'n'){
+	} else if	(key == 'n'){ // turn the navigator whel on/off
 			navigatorOn = navigatorOn ? false : true;
-	} else if	(key == 'a'){
+	} else if	(key == 'a'){ // turn on the amino acid circles on the protein path
 			aaOn = aaOn ? false : true;
-	} else if (key == 'c'){
+	} else if (key == 'c'){ // turn the colors of the protein path on/off
 			colorsOn = colorsOn ? false : true;
-	} else if	(key == '1'){
+	} else if	(key == '1'){ // Silk Heavy Chain
 			protein_selected = 0;
-	}	else if	(key == '2'){
+	}	else if	(key == '2'){ // Silk Light Chain
 			protein_selected = 1;
+	} else if (key == 'h'){
+		// Display help (need to write this)
 	}
 	
 	
-} // end keyPressed
+} // end keyPressed()
+
+// Draws the letters at the top left of the screen.
+void drawModes(){
+	pushStyle();
+	textSize(18);
+	textAlign(LEFT);
+	
+	if (magnifyMode){
+			fill(#D35806);
+			text("M", 10, 16);
+	}
+	
+	if (aaOn){
+			fill(#2F9416);
+			text("A", 30, 16);
+	}
+	
+	if (colorsOn){
+			fill(#2F9416);			
+			text("C", 50, 16);
+	}
+	
+	popStyle();
+} // end drawModes()
