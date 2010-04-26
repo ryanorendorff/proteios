@@ -99,7 +99,14 @@ class Protein{
 			
 		popStyle();
 		
-		// Draw the first amino acid line. 
+		// Set style for lines.
+		pushStyle();
+		textFont(aa_font);
+		textAlign(CENTER, CENTER);
+		textSize(12);
+		strokeWeight(2);
+		
+		// Draw the first amino acid line.
 		PVector first_vector = protein_shape_abs[1];
 		if (colorsOn) stroke(colors[0]);
 		line(0,0, first_vector.x*zoom, first_vector.y*zoom);
@@ -120,23 +127,33 @@ class Protein{
 			
 			// Draw ellipse for amino acid after drawing the line to the next one
 			// so that the line is not on top of the circle.
-			if (zoom > 20 && aaOn){
-				pushStyle();
+			if (zoom > 30 && aaOn){
 					if (colorsOn) stroke(colors[i-1]);
-					textAlign(CENTER, CENTER);
-					textSize(12);
+
 					
 					// Draw circle
-					strokeWeight(3);
-					fill(#FFFFFF);
-					ellipse(x1,y1, 14,14);
+					pushStyle();
+						strokeWeight(3);
+						fill(#FFFFFF);
+						ellipse(x1,y1, 14,14);
+					popStyle();
 					
 					// Add amino acid letter to circle.
 					fill(#000000);
-					text(sequence.charAt(i-1), x1-0.4,y1-1);
-				popStyle();
+					text(sequence.charAt(i-1), x1,y1);
+			} else if (zoom > 10 && aaOn){ // else just draw the circle.
+					if (colorsOn){
+						stroke(colors[i-1]);
+						fill(colors[i-1]);
+					} 
+					
+					// Draw circle
+					strokeWeight(3);
+					ellipse(x1,y1, 4,4);
+					
 			}
 		}
+		popStyle();
 	
 	} // end drawPath(float scale_factor)
 	

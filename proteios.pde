@@ -1,4 +1,4 @@
-// 	Note: use tab size 2
+//  Note: use tab size 2
 
 //  proteios.pde
 //  Proteios -- COMP 150-04
@@ -36,6 +36,7 @@ float zoom = 1;
 
 // Use custom cursor for magnify mode. 
 PImage resize_cursor;
+PFont aa_font;
 
 // Different modes of operation.
 boolean locked = false;
@@ -85,6 +86,7 @@ void setup(){
 	proteins[0] = new Protein(loadProteinSequence("sequence_heavy.txt"));
 	proteins[1] = new Protein(loadProteinSequence("sequence_light.txt"));
 	
+	aa_font = loadFont("Monaco-12.vlw");
 	textSize(12);
 
 } // end setup
