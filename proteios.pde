@@ -42,13 +42,14 @@ PFont aa_font;
 boolean locked = false;
 boolean magnifyMode = false;
 boolean navigatorOn = false;
-boolean aaOn = false;
+boolean aaOn = true;
+boolean lettersOn = true;
 boolean colorsOn = true;
 
 // angle from one amino acid to next.
 static final float angle_inc	= 360/21;
  
-Protein[] proteins = new Protein[2];
+ArrayList proteins = new ArrayList();
 int protein_selected = 0;
 
 // Amino Acids, sorted by type.						//	Type:				Color:
@@ -59,7 +60,8 @@ static final String aa_spe	= "CUGP"; 		//	Special			Purple
 static final String aa_pho	= "AILMFWYV"; //	Hydrophobic	Orange
 static final String aa			= "RHKDESTNQCUGPAILMFWYV";
 																//	Red			 Blue			Green		 Purple		Orange
-static final color[] aa_colors = { #E41A1C, #377EB8, #4DAF4A, #984EA3, #FF7F00 };
+static final color[] aa_colors_bright = { #E41A1C, #377EB8, #4DAF4A, #984EA3, #FF7F00 };
+static final color[] aa_colors_dim = { #460009, #00283C, #003915, #3B1337, #441500 };
 // Note: These finals are called in some classes (ex: Protein)
 
 void setup(){
@@ -83,19 +85,24 @@ void setup(){
 	resize_cursor = loadImage("resize_cursor.png");
 	
 	// load two proteins of silk. Will replace with search function.
-	proteins[0] = new Protein(loadProteinSequence("sequence_heavy.txt"));
-	proteins[1] = new Protein(loadProteinSequence("sequence_light.txt"));
+	loadProteinSequence("sequence_heavy.txt");
+	loadProteinSequence("sequence_light.txt");
+	loadProteinSequence("sequence_p25.txt");
+	loadProteinSequence("sequence_rdodesigns.txt");
 	
-	aa_font = loadFont("Monaco-12.vlw");
+	aa_font = loadFont("Monaco-10.vlw");
 	textSize(12);
 
 } // end setup
 
 
 void draw(){
+	// controlP5.draw();
+	Protein p = (Protein) proteins.get(protein_selected);
 	
 	background(0);
 	fill(#FFFFFF);
+	
 	
 	// Draws letter on top left of screen when a mode is on.
 	drawModes();
@@ -103,13 +110,8 @@ void draw(){
 	// Draw the name of the protein in the upper right.
 	pushStyle();
 		textAlign(RIGHT);
-		if (protein_selected == 0){
-			text("Silk Heavy Chain", width - 10, 10);
-		} else if (protein_selected == 1) {
-			text("Silk Light Chain", width - 10, 10);
-		}
-		
-		text(zoom+"x", width-10, height-10);
+			text(p.name, width - 10, 10);
+			text(zoom+"x", width-10, height-10);
 	popStyle();
 
 	// Make the middle of the screen (0,0). Note going up is the negative y.
@@ -122,7 +124,7 @@ void draw(){
 	
 		pushMatrix();
 			translate(grid_pos.x, grid_pos.y);			
-			proteins[protein_selected].drawPath(zoom);
+			p.drawPath(zoom);
 		popMatrix();
 		
 	popStyle();
@@ -138,9 +140,11 @@ void draw(){
 } // end draw
 
 // Loads a protein. Note that the text file is only the protein sequence.
-String loadProteinSequence(String protein_file){
-	String[] sequence = loadStrings(protein_file);
-	return sequence[0].toUpperCase();
+void loadProteinSequence(String protein_file){
+	String[] file = loadStrings(protein_file);
+	String sequence = file[1];
+	
+	proteins.add(new Protein(file[0], sequence.toUpperCase()));
 } // end loadProteinSequence
 
 
@@ -164,15 +168,15 @@ void drawNavigator(){
 	ellipse(0,0,8,8);
 
 	// Draw the arcs for the navigator
-	stroke(aa_colors[0]);
+	stroke(aa_colors_bright[0]);
 	arc(0,0, 370, 370, 0, radians(angle_inc*2));
-	stroke(aa_colors[1]);
+	stroke(aa_colors_bright[1]);
 	arc(0,0, 370, 370, radians(angle_inc*3), radians(angle_inc*4));
-	stroke(aa_colors[2]);
+	stroke(aa_colors_bright[2]);
 	arc(0,0, 370, 370, radians(angle_inc*5), radians(angle_inc*8));
-	stroke(aa_colors[3]);
+	stroke(aa_colors_bright[3]);
 	arc(0,0, 370, 370, radians(angle_inc*9), radians(angle_inc*12));
-	stroke(aa_colors[4]);
+	stroke(aa_colors_bright[4]);
 	arc(0,0, 370, 370, radians(angle_inc*13), radians(angle_inc*20));
 		
 	// Reset
@@ -231,25 +235,92 @@ void mouseDragged(){
 
 
 void keyPressed(){
+
+	int modifiers = keyEvent.getModifiersEx() ;
+	
+	//// Used to find the value of each modiefier key (ex: SHIFT = 64, SHIFT+ALT = 576)
+	//// Thank you Mr. Fry. http://processing.org/discourse/yabb2/YaBB.pl?num=1128189621 
+	// String keyString = "key code = " + keyCode + " (" + KeyEvent.getKeyText(keyCode) + ")" + " and keyChar = " + key ;
+	// 		println(keyString) ;
+	// 	
+	// 		// warning, getModifiersEx() requires java 1.4
+	// 		// (will break on mac with firefox or ie)
+	// 	
+	// 	String modString = "modifiers = " + modifiers ;
+	// 	String tmpString = KeyEvent.getModifiersExText(modifiers) ;
+	// 	if (tmpString.length() > 0)
+	// 	{
+	// 		modString += " (" + tmpString + ")" ;
+	// 	}
+	// 	else
+	// 	{
+	// 		modString += " (no modifiers)" ;
+	// 	}
+	// 	println(modString) ;
+	// 	
+	// 	println("action key? " + (keyEvent.isActionKey() ? "YES" : "NO")) ;
+	
 	if				(key == 'm'){ // Turn on magnification mouse movements
 			magnifyMode = magnifyMode ? false : true;
 	} else if	(key == 'o'){ // return to the origin
 			grid_pos.x = 0;
 			grid_pos.y = 0;
+	} else if (key == 'O'){ // Center and maximize the protein.
+			Protein p = (Protein) proteins.get(protein_selected);
+
+			float zoom_x = floor(width / p.protein_width);
+			float zoom_y = floor(height / p.protein_height);
+
+			zoom = zoom_x >= zoom_y ? zoom_y : zoom_x;
+			grid_pos.x = -p.center.x*zoom;
+			grid_pos.y = -p.center.y*zoom;
 	} else if	(key == 'n'){ // turn the navigator whel on/off
 			navigatorOn = navigatorOn ? false : true;
 	} else if	(key == 'a'){ // turn on the amino acid circles on the protein path
 			aaOn = aaOn ? false : true;
 	} else if (key == 'c'){ // turn the colors of the protein path on/off
 			colorsOn = colorsOn ? false : true;
+	} else if (key == 'l') {
+			lettersOn = lettersOn ? false : true;
 	} else if	(key == '1'){ // Silk Heavy Chain
 			protein_selected = 0;
 	}	else if	(key == '2'){ // Silk Light Chain
 			protein_selected = 1;
+	} else if (key == '3'){
+			protein_selected = 2;
+	} else if (key == '4'){
+			protein_selected = 3;
+	} else if (key == TAB){
+			protein_selected = (protein_selected +1) % 4; 
 	} else if (key == 'h'){
 		// Display help (need to write this)
 	}
 	
+	
+	if(key == CODED) { 
+		Protein p = (Protein) proteins.get(protein_selected);
+		
+		if (keyCode == LEFT){
+			if (modifiers == 576) {
+				p.reduceSegments(20);
+			} else if (modifiers == 64) {
+				p.reduceSegments(5);
+			} else {
+				p.reduceSegments(1);
+			}
+		} else if (keyCode == RIGHT){
+			if (modifiers == 576) {
+				p.increaseSegments(20);
+			} else if (modifiers == 64) {
+				p.increaseSegments(5);
+			} else {
+				p.increaseSegments(1);
+			}
+		} else if (keyCode == UP){
+			p.allSegments();
+		} else if (keyCode == DOWN)
+			p.noSegments();
+	}
 	
 } // end keyPressed()
 
@@ -267,6 +338,12 @@ void drawModes(){
 	if (aaOn){
 			fill(#2F9416);
 			text("A", 30, 16);
+			if (lettersOn){
+				pushStyle();
+					textSize(10);
+					text("L", 44, 20);
+				popStyle();
+			}
 	}
 	
 	if (colorsOn){
