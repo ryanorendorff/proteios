@@ -6,7 +6,7 @@
 //  Copyright 2010 RDO Designs. All rights reserved.
 // 
 
-//  Code available under the GPLv3.
+//  Code available under the GPLv3. See proteios.pde and gpl3.txt for full license information.
 
 class Protein{
 	String sequence;
@@ -46,7 +46,7 @@ class Protein{
 	
 	// Creates a PVector[] that holds each node in the sequence
 	// Note: all vectors are unit vectors.
-	void calculatePath(){
+	private void calculatePath(){
 		protein_shape_abs[0] = new PVector(0,0);
 		protein_shape_rel[0] = new PVector(0,0);
 
@@ -94,7 +94,7 @@ class Protein{
 	
 	// Calculate the color of each line segment beforehand. Reduces computation
 	// per draw cycle (but increases memory slightly)
-	color calculateColors(CharSequence c, String type){
+	private color calculateColors(CharSequence c, String type){
 		if (aa_pos.contains(c)){
 			if (type == "bright") return aa_colors_bright[0];
 			if (type == "dim") return aa_colors_dim[0];
@@ -178,11 +178,11 @@ class Protein{
 	
 	} // end drawPath(float scale_factor)
 	
-	void drawAminoAcid(int sequence_index, PVector location){
+	private void drawAminoAcid(int sequence_index, PVector location){
 		drawAminoAcid(sequence_index, location, #FFFFFF);
 	}
 	
-	void drawAminoAcid(int sequence_index, PVector location, color circle_color){
+	private void drawAminoAcid(int sequence_index, PVector location, color circle_color){
 		pushStyle();
 	
 		if (zoom > 30 && aaOn && lettersOn){
@@ -235,7 +235,7 @@ class Protein{
 		this.on_segments = 0;
 	}
 	
-	color brightOrDim(int index){
+	private color brightOrDim(int index){
 		if (colorsOn){
 			if (on_segments > index){
 				return colors_bright[index];

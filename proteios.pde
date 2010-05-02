@@ -38,6 +38,9 @@ float zoom = 1;
 PImage resize_cursor;
 PFont aa_font;
 
+int time_display_choices = 0;
+int time_display_choices_max = 60; 
+
 // Different modes of operation.
 boolean locked = false;
 boolean magnifyMode = false;
@@ -85,10 +88,11 @@ void setup(){
 	resize_cursor = loadImage("resize_cursor.png");
 	
 	// load two proteins of silk. Will replace with search function.
-	loadProteinSequence("sequence_heavy.txt");
-	loadProteinSequence("sequence_light.txt");
-	loadProteinSequence("sequence_p25.txt");
-	loadProteinSequence("sequence_rdodesigns.txt");
+	String[] files = listFileNames(sketchPath + "/data/sequences/");
+
+	for (int i = 0; i < files.length; i++){
+		loadProteinSequence("sequences/"+files[i]);
+	}
 	
 	aa_font = loadFont("Monaco-10.vlw");
 	textSize(12);
@@ -97,7 +101,6 @@ void setup(){
 
 
 void draw(){
-	// controlP5.draw();
 	Protein p = (Protein) proteins.get(protein_selected);
 	
 	background(0);
@@ -110,7 +113,20 @@ void draw(){
 	// Draw the name of the protein in the upper right.
 	pushStyle();
 		textAlign(RIGHT);
-			text(p.name, width - 10, 10);
+			if (time_display_choices < time_display_choices_max){
+				for (int i=0; i < proteins.size(); i++){
+					Protein temp_p = (Protein) proteins.get(i);
+					if (i == protein_selected){
+						fill(#FFFFFF);
+					} else{
+						fill(#999999);
+					}
+					text(temp_p.name, width - 10, 12*(i+1) + 4*i);
+				}
+				time_display_choices++;
+			} else {
+				text(p.name, width - 10, 12);
+			}
 			text(zoom+"x", width-10, height-10);
 	popStyle();
 
@@ -147,6 +163,18 @@ void loadProteinSequence(String protein_file){
 	proteins.add(new Protein(file[0], sequence.toUpperCase()));
 } // end loadProteinSequence
 
+// Outputs a String[] of the files in a directory.
+// note: sketchPath variable holds location of sketch.
+String[] listFileNames(String dir) {
+  File file = new File(dir);
+  if (file.isDirectory()) {
+    String names[] = file.list();
+    return names;
+  } else {
+    // If it's not a directory
+    return null;
+  }
+}
 
 // Draws the Navigator circle. Turn on/off with the 'n' key.
 void drawNavigator(){
@@ -266,14 +294,7 @@ void keyPressed(){
 			grid_pos.x = 0;
 			grid_pos.y = 0;
 	} else if (key == 'O'){ // Center and maximize the protein.
-			Protein p = (Protein) proteins.get(protein_selected);
-
-			float zoom_x = floor(width / p.protein_width);
-			float zoom_y = floor(height / p.protein_height);
-
-			zoom = zoom_x >= zoom_y ? zoom_y : zoom_x;
-			grid_pos.x = -p.center.x*zoom;
-			grid_pos.y = -p.center.y*zoom;
+			drawProteinToFit();
 	} else if	(key == 'n'){ // turn the navigator whel on/off
 			navigatorOn = navigatorOn ? false : true;
 	} else if	(key == 'a'){ // turn on the amino acid circles on the protein path
@@ -282,16 +303,18 @@ void keyPressed(){
 			colorsOn = colorsOn ? false : true;
 	} else if (key == 'l') {
 			lettersOn = lettersOn ? false : true;
-	} else if	(key == '1'){ // Silk Heavy Chain
-			protein_selected = 0;
-	}	else if	(key == '2'){ // Silk Light Chain
-			protein_selected = 1;
-	} else if (key == '3'){
-			protein_selected = 2;
-	} else if (key == '4'){
-			protein_selected = 3;
 	} else if (key == TAB){
-			protein_selected = (protein_selected +1) % 4; 
+			if (modifiers == 64){
+				if (protein_selected == 0){
+					protein_selected = proteins.size()-1;
+				} else {
+					protein_selected = (protein_selected -1) % proteins.size();
+				}
+			} else {
+				protein_selected = (protein_selected +1) % proteins.size();
+			}
+			time_display_choices = 0;
+			drawProteinToFit();
 	} else if (key == 'h'){
 		// Display help (need to write this)
 	}
@@ -353,3 +376,15 @@ void drawModes(){
 	
 	popStyle();
 } // end drawModes()
+
+void drawProteinToFit(){
+	Protein p = (Protein) proteins.get(protein_selected);
+
+	float zoom_x = floor(width / p.protein_width);
+	float zoom_y = floor(height / p.protein_height);
+
+	zoom = zoom_x >= zoom_y ? zoom_y : zoom_x;
+	zoom -= floor(zoom/25);
+	grid_pos.x = -p.center.x*zoom;
+	grid_pos.y = -p.center.y*zoom;
+}
