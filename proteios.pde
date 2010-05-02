@@ -355,23 +355,23 @@ void drawModes(){
 	
 	if (magnifyMode){
 			fill(#D35806);
-			text("M", 10, 16);
+			text("m", 10, 16);
 	}
 	
 	if (aaOn){
 			fill(#2F9416);
-			text("A", 30, 16);
+			text("a", 30, 16);
 			if (lettersOn){
 				pushStyle();
 					textSize(10);
-					text("L", 44, 20);
+					text("L", 40, 20);
 				popStyle();
 			}
 	}
 	
 	if (colorsOn){
 			fill(#2F9416);			
-			text("C", 50, 16);
+			text("c", 50, 16);
 	}
 	
 	popStyle();
