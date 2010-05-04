@@ -68,7 +68,7 @@ static final color[] aa_colors_dim = { #460009, #00283C, #003915, #3B1337, #4415
 // Note: These finals are called in some classes (ex: Protein)
 
 void setup(){
-	size(600,600);
+	size(1280,720);
 	frameRate(30);
 	
 	// Is resizable. Useful, so that 600x600 is not limiting.
@@ -127,6 +127,7 @@ void draw(){
 			} else {
 				text(p.name, width - 10, 12);
 			}
+			fill(#FFFFFF);
 			text(zoom+"x", width-10, height-10);
 	popStyle();
 
@@ -174,7 +175,7 @@ String[] listFileNames(String dir) {
     // If it's not a directory
     return null;
   }
-}
+} // end listFileNames
 
 // Draws the Navigator circle. Turn on/off with the 'n' key.
 void drawNavigator(){
@@ -290,10 +291,10 @@ void keyPressed(){
 	
 	if				(key == 'm'){ // Turn on magnification mouse movements
 			magnifyMode = magnifyMode ? false : true;
-	} else if	(key == 'o'){ // return to the origin
+	} else if	(key == 'O'){ // return to the origin
 			grid_pos.x = 0;
 			grid_pos.y = 0;
-	} else if (key == 'O'){ // Center and maximize the protein.
+	} else if (key == 'o'){ // Center and maximize the protein.
 			drawProteinToFit();
 	} else if	(key == 'n'){ // turn the navigator whel on/off
 			navigatorOn = navigatorOn ? false : true;
@@ -315,6 +316,9 @@ void keyPressed(){
 			}
 			time_display_choices = 0;
 			drawProteinToFit();
+			
+			Protein p = (Protein) proteins.get(protein_selected);
+			p.allSegments();
 	} else if (key == 'h'){
 		// Display help (need to write this)
 	}

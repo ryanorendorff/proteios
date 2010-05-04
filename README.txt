@@ -68,8 +68,8 @@ Some of the amino acids have multiple properties that overlap. In this case, the
 
 The protein can be moved around by left clicking anywhere in the application and dragging the mouse to a new location. If Magnify Mode is on, clicking and dragging the mouse causes the protein to become larger or smaller if you drag the mouse to the right or left, respectively. Additionally, there are two key presses to help with orienting the protein
 -------------------------------------------------------------------------------
-lower case letter o = Center the Red Dot in the middle of the screen
 upper case letter O = Fit the protein to the screen
+lower case letter o = Center the Red Dot in the middle of the screen
 -------------------------------------------------------------------------------
 
 Multiple sequences are loaded into the program by default. To switch between the sequences press the tab key. To go in reverse through the list, press shift+tab.
