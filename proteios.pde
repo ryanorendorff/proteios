@@ -26,8 +26,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Proteios. If not, see the GNU website for a copy.
 
-import fullscreen.*;
-SoftFullScreen fs;
+// import fullscreen.*;
+// SoftFullScreen fs;
 
 // Vectors for positions of grid related to the screen.
 PVector held_pos = new PVector(0,0);
@@ -78,8 +78,8 @@ void setup(){
 	// Fullscreen mode. Note that it takes on the size of the window
 	// and makes everything else black (so, a 600x600 window is just
 	// centered and surrounded by black instead of resized)
-	fs = new SoftFullScreen(this);
-	fs.setShortcutsEnabled(true);
+	// fs = new SoftFullScreen(this);
+	// fs.setShortcutsEnabled(true);
 	// fs.setResolution(x, y)
 	
 	smooth();
