@@ -12,7 +12,7 @@ The Proteios program provides a geometrical way of looking at protein sequences.
 ==============
 To run the program, open "proteios.pde" in the Processing environment. If you do not have the Processing environment, then you can download a copy from http://processing.org/ and follow their instructions on how to install Processing.
 
-At this time, it is not possible to export this application as a stand-alone binary.
+There are also binaries available for each of the major OS platforms. These are all located in "./binary". You must have java installed on you system in order to run these programs (http://java.com/en/download/manual.jsp for most platforms, and each Linux distribution most likely has its own package for it in their repositories).
 
 ==============
 = How to use =
@@ -96,12 +96,12 @@ alt+shift+right = Highlight the next twenty segments
 = How to load/unload sequences =
 ================================
 
-All of the sequences are located in "./data/sequences/". To remove a sequence from the program, simply relocate or delete the file in question.
+All of the sequences are located in "./data/sequences.txt". To remove a sequence from the program, remove its lines in the file specified above.
 
-To add a protein to the program, the python script "protein_to_proteios.py" can be used to take the information out of a GenPept file from the NCBI database and turn it into a format that Proteios understands. To run this program, simply put the GenPept files that you want to convert in the "proteins_to_be_converted" folder and run in the main directory of Proteios
+To add a protein to the program, the python script "sequences_to_single_file.py" can be used to take the information out of a GenPept file from the NCBI database and turn it into a format that Proteios understands. To run this program, simply put the GenPept files that you want to convert in the "proteins_to_be_converted" folder and run in the main directory of Proteios
 
-  python protein_to_proteios.py
+  python sequences_to_single_file.py
 
-This generates text files for the sequences that are placed in "./data/sequences/".
+This generates a text file for the sequences that is placed in "./data/sequences.txt".
 
-The files are simple. The first line of the file is the name of the protein. The second is the sequence and only the sequence (no spaces, numbering, etc). The sequence can be in either upper or lower case; Proteios will automatically convert everything to upper case when it imports the file.
+The file is simple. The first line of the file is the name of the protein. The second is the sequence and only the sequence (no spaces, numbering, etc). This pattern then repeats for the other proteins in the file. The sequence can be in either upper or lower case; Proteios will automatically convert everything to upper case when it imports the file.

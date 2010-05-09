@@ -72,8 +72,8 @@ void setup(){
 	frameRate(30);
 	
 	// Is resizable. Useful, so that 600x600 is not limiting.
-	frame.setResizable(true);
-	frame.setTitle("Proteios - Protein Visualization");
+	// frame.setResizable(true);
+	// frame.setTitle("Proteios - Protein Visualization");
 	
 	// Fullscreen mode. Note that it takes on the size of the window
 	// and makes everything else black (so, a 600x600 window is just
