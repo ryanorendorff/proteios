@@ -6,10 +6,10 @@
 //  Created by Ryan Orendorff on 2010-04-15.
 //  Copyright 2010 RDO Designs. All rights reserved.
 
-//  www:     http://www.rdodesigns.com
-//  github:  http://github.com/proteios 
-//  email:   ryan.orendorff@gmail.com
-//  Twitter: RDO_Designs
+//  www:        http://www.rdodesigns.com
+//  gitorious:  http://gitorious.org/proteios 
+//  email:      ryan.orendorff@gmail.com
+//  Twitter:    RDO_Designs
 
 //  This file is part of Proteios.
 //  
