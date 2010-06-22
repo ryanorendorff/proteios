@@ -29,6 +29,9 @@
 import fullscreen.*;
 SoftFullScreen fs;
 
+import processing.video.*;
+MovieMaker mm;  // Declare MovieMaker object
+
 // Vectors for positions of grid related to the screen.
 PVector held_pos = new PVector(0,0);
 PVector grid_pos = new PVector(0,0);
@@ -97,8 +100,34 @@ void setup(){
 	aa_font = loadFont("Monaco-10.vlw");
 	textSize(12);
 
+	mm = new MovieMaker(this, width, height,
+	                    "proteios"+timeStamp()+".mov",
+	                     30, MovieMaker.ANIMATION, MovieMaker.HIGH);
+
 } // end setup
 
+String timeStamp()
+{
+	String year = String.valueOf(year());
+	
+	String  mon =  month() < 10 ? "0"+String.valueOf(month()) 
+	                            : String.valueOf(month());
+	
+	String  day =    day() < 10 ? "0"+String.valueOf(day()) 
+	                            : String.valueOf(day());
+	
+	String hour =   hour() < 10 ? "0"+String.valueOf(hour()) 
+	                            : String.valueOf(hour());
+	
+	String  min = minute() < 10 ? "0"+String.valueOf(minute()) 
+	                            : String.valueOf(minute());
+	
+	String  sec = second() < 10 ? "0"+String.valueOf(second()) 
+	                            : String.valueOf(second());
+	
+	return year+mon+day+hour+min+sec;
+	
+}
 
 void draw(){
 	Protein p = (Protein) proteins.get(protein_selected);
@@ -153,7 +182,7 @@ void draw(){
 		popMatrix();
 	}
 	
-	
+	mm.addFrame();
 } // end draw
 
 // Loads a protein. Note that the text file is only the protein sequence.
@@ -321,6 +350,8 @@ void keyPressed(){
 			p.allSegments();
 	} else if (key == 'h'){
 		// Display help (need to write this)
+	} else if (key == 's'){
+		mm.finish();
 	}
 	
 	
