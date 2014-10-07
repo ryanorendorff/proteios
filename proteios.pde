@@ -265,29 +265,7 @@ void keyPressed(){
 
     int modifiers = keyEvent.getModifiersEx() ;
 
-    //// Used to find the value of each modiefier key (ex: SHIFT = 64, SHIFT+ALT = 576)
-    //// Thank you Mr. Fry. http://processing.org/discourse/yabb2/YaBB.pl?num=1128189621
-    // String keyString = "key code = " + keyCode + " (" + KeyEvent.getKeyText(keyCode) + ")" + " and keyChar = " + key ;
-    //         println(keyString) ;
-    //
-    //         // warning, getModifiersEx() requires java 1.4
-    //         // (will break on mac with firefox or ie)
-    //
-    //     String modString = "modifiers = " + modifiers ;
-    //     String tmpString = KeyEvent.getModifiersExText(modifiers) ;
-    //     if (tmpString.length() > 0)
-    //     {
-    //         modString += " (" + tmpString + ")" ;
-    //     }
-    //     else
-    //     {
-    //         modString += " (no modifiers)" ;
-    //     }
-    //     println(modString) ;
-    //
-    //     println("action key? " + (keyEvent.isActionKey() ? "YES" : "NO")) ;
-
-    if                (key == 'm'){ // Turn on magnification mouse movements
+    if (key == 'm'){ // Turn on magnification mouse movements
         magnifyMode = magnifyMode ? false : true;
     } else if    (key == 'O'){ // return to the origin
         grid_pos.x = 0;
